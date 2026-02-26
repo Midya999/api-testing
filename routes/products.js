@@ -7,15 +7,19 @@ const {
   createProduct,
   updateProduct,
   patchProduct,
-  deleteProduct
+  deleteProduct,
+  deleteManyProducts,
 } = require("../controllers/products");
 
-/* Root */
+// BULK DELETE
+router.delete("/bulk", deleteManyProducts);
+
+// ROOT ROUTE
 router.route("/")
   .get(getAllProducts)
   .post(createProduct);
 
-/* With ID */
+// SINGLE PRODUCT ROUTES
 router.route("/:id")
   .get(getSingleProduct)
   .put(updateProduct)

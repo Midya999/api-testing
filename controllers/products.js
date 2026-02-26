@@ -1,103 +1,85 @@
 const Product = require("../model/products");
 
-/* ===============================
-   GET ALL PRODUCTS
-================================= */
+// GET ALL
 const getAllProducts = async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.status(200).json({ count: products.length, products });
-  } catch (error) {
-    res.status(500).json({ error: "Server Error" });
-  }
+  const products = await Product.find({});
+  res.status(200).json({ products });
 };
 
-/* ===============================
-   GET SINGLE PRODUCT
-================================= */
+// GET SINGLE
 const getSingleProduct = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
+  const { id } = req.params;
+  const product = await Product.findById(id);
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ error: "Invalid ID" });
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
   }
+
+  res.status(200).json({ product });
 };
 
-/* ===============================
-   CREATE PRODUCT
-================================= */
+// CREATE
 const createProduct = async (req, res) => {
-  try {
-    const product = await Product.create(req.body);
-    res.status(201).json(product);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+  const product = await Product.create(req.body);
+  res.status(201).json({ product });
 };
 
-/* ===============================
-   UPDATE PRODUCT (PUT)
-================================= */
+// UPDATE (PUT)
 const updateProduct = async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+  const { id } = req.params;
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+  const product = await Product.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ error: "Update failed" });
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
   }
+
+  res.status(200).json({ product });
 };
 
-/* ===============================
-   PARTIAL UPDATE (PATCH)
-================================= */
+// PATCH (Partial Update)
 const patchProduct = async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+  const { id } = req.params;
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+  const product = await Product.findByIdAndUpdate(id, req.body, {
+    new: true,
+  });
 
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ error: "Patch failed" });
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
   }
+
+  res.status(200).json({ product });
 };
 
-/* ===============================
-   DELETE PRODUCT
-================================= */
+// DELETE SINGLE
 const deleteProduct = async (req, res) => {
-  try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+  const { id } = req.params;
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+  const product = await Product.findByIdAndDelete(id);
 
-    res.status(200).json({ message: "Product deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Delete failed" });
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
   }
+
+  res.status(200).json({ message: "Product deleted successfully" });
+};
+
+// DELETE MANY
+const deleteManyProducts = async (req, res) => {
+  const { ids } = req.body;
+
+  const result = await Product.deleteMany({
+    _id: { $in: ids },
+  });
+
+  res.status(200).json({
+    message: "Products deleted successfully",
+    deletedCount: result.deletedCount,
+  });
 };
 
 module.exports = {
@@ -106,5 +88,6 @@ module.exports = {
   createProduct,
   updateProduct,
   patchProduct,
-  deleteProduct
+  deleteProduct,
+  deleteManyProducts,
 };

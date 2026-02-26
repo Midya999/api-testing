@@ -12,7 +12,18 @@ const {
 } = require("../controllers/products");
 
 // BULK DELETE
-router.delete("/bulk", deleteManyProducts);
+router.delete("/bulk", async (req, res) => {
+  try {
+    const result = await Product.deleteMany({});
+    res.status(200).json({
+      success: true,
+      deleted: result.deletedCount
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false });
+  }
+});
 
 // ROOT ROUTE
 router.route("/")

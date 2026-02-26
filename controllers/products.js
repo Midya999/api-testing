@@ -56,16 +56,21 @@ const patchProduct = async (req, res) => {
 };
 
 // DELETE SINGLE
-const deleteProduct = async (req, res) => {
-  const { id } = req.params;
+const deleteAllProducts = async (req, res) => {
+  try {
+    const result = await Product.deleteMany({}); // IMPORTANT {}
 
-  const product = await Product.findByIdAndDelete(id);
+    res.status(200).json({
+      message: "Products deleted successfully",
+      deletedCount: result.deletedCount
+    });
 
-  if (!product) {
-    return res.status(404).json({ message: "Product not found" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message
+    });
   }
-
-  res.status(200).json({ message: "Product deleted successfully" });
 };
 
 // DELETE MANY

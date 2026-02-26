@@ -1,25 +1,13 @@
-const express = require('express');
-const connectDB = require('./db/connect');
-require('dotenv').config();
+const helmet = require("helmet");
+const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 
-const product_router = require('./routes/products');
+app.use(helmet());
+app.use(cors());
 
-const app = express();
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200
+});
 
-app.use(express.json());
-app.use('/api/v1/products', product_router);
-
-const port = process.env.PORT || 5000;
-
-const start = async () => {
-  try {
-    await connectDB();
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-start();
+app.use(limiter);

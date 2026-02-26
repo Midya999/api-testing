@@ -40,7 +40,7 @@ const updateProduct = async (req, res) => {
   res.status(200).json({ product });
 };
 
-// PATCH (Partial Update)
+// PATCH
 const patchProduct = async (req, res) => {
   const { id } = req.params;
 
@@ -56,24 +56,32 @@ const patchProduct = async (req, res) => {
 };
 
 // DELETE SINGLE
+const deleteProduct = async (req, res) => {
+  const { id } = req.params;
+
+  const product = await Product.findByIdAndDelete(id);
+
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  res.status(200).json({ message: "Product deleted successfully" });
+};
+
+// DELETE ALL
 const deleteAllProducts = async (req, res) => {
   try {
-    const result = await Product.deleteMany({}); // IMPORTANT {}
-
+    const result = await Product.deleteMany({});
     res.status(200).json({
-      message: "Products deleted successfully",
-      deletedCount: result.deletedCount
+      message: "All products deleted successfully",
+      deletedCount: result.deletedCount,
     });
-
   } catch (error) {
-    res.status(500).json({
-      message: "Something went wrong",
-      error: error.message
-    });
+    res.status(500).json({ error: error.message });
   }
 };
 
-// DELETE MANY
+// DELETE MANY BY IDS
 const deleteManyProducts = async (req, res) => {
   const { ids } = req.body;
 
@@ -82,7 +90,7 @@ const deleteManyProducts = async (req, res) => {
   });
 
   res.status(200).json({
-    message: "Products deleted successfully",
+    message: "Selected products deleted successfully",
     deletedCount: result.deletedCount,
   });
 };
@@ -94,5 +102,6 @@ module.exports = {
   updateProduct,
   patchProduct,
   deleteProduct,
+  deleteAllProducts,
   deleteManyProducts,
 };
